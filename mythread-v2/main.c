@@ -4,24 +4,16 @@
 
 extern mythread *tasks[NR_TASKS];
 
-int _mutex = 1;
-int _free = 0;
 
-void _wait(int* i) {
-	*i-=1;
-	while (*i < 0);
-}
-
-void _signal(int* i) {
-    *i+=1;
-}
+semaphore* _mutex;
+semaphore* _free;
 
 void fun1()
 {
     for (int i = 0; i < 10; i++) {
-        _wait(&_mutex);
+        _wait(_mutex);
         printf("func1\n");
-        _signal(&_free);
+        _notify(_free);
     }
 
 }
@@ -29,14 +21,26 @@ void fun1()
 void fun2()
 {
     for (int i = 0; i < 10; i++) {
-        _wait(&_free);
+        _wait(_free);
         printf("func2\n");
-        _signal(&_mutex);
+        _notify(_mutex);
     }
+}
+
+void init() {
+    _mutex = (semaphore*) malloc(sizeof(semaphore));
+    _free = (semaphore*) malloc(sizeof(semaphore));
+    _mutex->value = 1;
+    _free->value = 0;
+    mythread** p1 =  (mythread** )malloc(sizeof(mythread*));
+    mythread** p2 = (mythread** )malloc(sizeof(mythread*));
+    _mutex->p = p1;
+    _free->p = p2;
 }
 
 int main()
 {
+    init();
     int pid1 = thread_create(fun1, 15);
     int pid2 = thread_create(fun2, 15);
     thread_start(pid1);

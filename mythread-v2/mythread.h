@@ -23,6 +23,11 @@ typedef struct thread_struct {
     int stack[STACK_SIZE];
 } mythread;
 
+typedef struct semaphore {
+    int value;
+    mythread** p;
+} semaphore;
+
 void schedule();
 
 int thread_create(void (*func)(), int proerity);
@@ -40,3 +45,11 @@ void mysleep(int second);
 void closealarm();
 
 void openalarm();
+
+void _wait(semaphore* s);
+
+void _notify(semaphore* s);
+
+void _sleep_on(mythread** p);
+
+void _wake_up(mythread** p);

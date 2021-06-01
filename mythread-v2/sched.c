@@ -97,3 +97,25 @@ __attribute__((constructor)) static void thread_timer_init()
 
     signal(SIGALRM, do_timer);
 }
+
+void _sleep_on(mythread** p) {
+    mythread* tmp;
+    if (!p) {
+        return;
+    }
+
+    tmp = *p;
+    *p = cur;
+    cur->state = THREAD_UNINPUTTERABLE;
+    schedule();
+
+    if (tmp)
+        tmp -> state = THREAD_RUNNABLE;
+}
+
+void _wake_up(mythread** p) {
+    if (p && *p) {
+        (*p)->state = THREAD_RUNNABLE;
+        *p = NULL;
+    } 
+}

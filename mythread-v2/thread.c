@@ -89,3 +89,18 @@ void thread_join(int pid) {
     tasks[pid] = NULL;
 }
 
+void _wait(semaphore* s) {
+    s->value--;
+
+    if (s->value < 0) {
+        _sleep_on(s->p);
+    }
+}
+
+void _notify(semaphore* s) {
+    s->value++;
+    
+    if (s->value >= 0) {
+        _wake_up(s->p);
+    }
+}
